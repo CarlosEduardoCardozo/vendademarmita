@@ -8,7 +8,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeScreen = () => {
   const [visible, setVisible] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState([false]);
   const [totalPrice, setTotalPrice] = useState(0);
 
   const addItemToCart = (item) => {
@@ -31,7 +31,7 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Bom dia Eduardo</Text>
+        <Text style={styles.headerText}>Bom dia Professor Eduardo</Text>
         <Image source={require('./assets/logo.png')} style={styles.logo} />
         <TouchableOpacity onPress={() => setVisible(true)}>
           <MaterialIcons name="shopping-cart" size={24} color="white" />
@@ -104,7 +104,7 @@ const App = () => {
     <NavigationContainer>
       <Tab.Navigator tabBarOptions={{ style: styles.tabBar }}>
         <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} /> }} />
-        <Tab.Screen name="Carrinho" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="shopping-cart" size={24} color={color} /> }} />
+        <Tab.Screen name="Carrinho" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons  name="shopping-cart" size={24} color={color} /> }} />
       </Tab.Navigator>
     </NavigationContainer>
   );
