@@ -1,326 +1,243 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  FlatList,
-  Modal,
-} from 'react-native';
-import { Icon } from 'react-native-elements';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal, Button } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 
-const MENU = [
-  {
-    id: 1,
-    name: 'Marmita 1',
-    description: 'Deliciosa marmita com frango e arroz',
-    price: 10.0,
-    image: 'https://picsum.photos/id/1/200',
-  },
-  {
-    id: 2,
-    name: 'Marmita 2',
-    description: 'Deliciosa marmita com carne e feijão',
-    price: 12.5,
-    image: 'https://picsum.photos/id/2/200',
-  },
-  {
-    id: 3,
-    name: 'Marmita 3',
-    description: 'Deliciosa marmita com peixe e legumes',
-    price: 15.0,
-    image: 'https://picsum.photos/id/3/200',
-  },
-];
+const Tab = createBottomTabNavigator();
 
-export default function App() {
-  const [cartItems, setCartItems] = useState([]);
+const HomeScreen = () => {
   const [visible, setVisible] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
 
-  const toggleModal = () => {
-    setVisible(!visible);
-  };
-
-  const addToCart = (item) => {
+  const addItemToCart = (item) => {
     setCartItems([...cartItems, item]);
+    setTotalPrice(totalPrice + 10);
   };
 
-  const removeFromCart = (itemToRemove) => {
-    setCartItems(cartItems.filter((item) => item.id !== itemToRemove.id));
+  const removeItemFromCart = (item) => {
+    const index = cartItems.indexOf(item);
+    const newCartItems = [...cartItems];
+    newCartItems.splice(index, 1);
+    setCartItems(newCartItems);
+    setTotalPrice(totalPrice - 10);
+  };
+
+  const onClose = () => {
+    setVisible(false);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.navBar}>
-        <Text style={styles.navBarText}>
-          Bom dia/Boa tarde/Boa noite
-        </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Bom dia Eduardo</Text>
+        <Image source={require('./assets/logo.png')} style={styles.logo} />
+        <TouchableOpacity onPress={() => setVisible(true)}>
+          <MaterialIcons name="shopping-cart" size={24} color="white" />
+        </TouchableOpacity>
       </View>
-      <View style={styles.content}>
-        <FlatList
-          data={MENU}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => addToCart(item)}
-            >
-              <View style={styles.menuItemImageContainer}>
-                <Icon
-                  name="food"
-                  type="material"
-                  color="#fff"
-                  size={40}
-                />
-              </View>
-              <View style={styles.menuItemInfo}>
-                <Text style={styles.menuItemName}>{item.name}</Text>
-                <Text style={styles.menuItemDescription}>
-                  {item.description}
-                </Text>
-                <Text style={styles.menuItemPrice}>
-                  R$ {item.price.toFixed(2)}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-        />
-      </View>
-      <Modal visible={visible} animationType="slide">
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
-            <Icon name="close" type="material" color="#6e798c" size={30} />
+      <ScrollView style={styles.content}>
+        <View style={styles.item}>
+          <Image source={require('./assets/marmita1.png')} style={styles.itemImage} />
+          <View style={styles.itemInfo}>
+            <Text style={styles.itemName}>Marmita Especial</Text>
+            <Text style={styles.itemPrice}>R$ 10,00</Text>
+          </View>
+          <TouchableOpacity onPress={() => addItemToCart('Marmita Especial')} style={styles.itemButton}>
+            <Text style={styles.itemButtonText}>Adicionar ao Carrinho</Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+          <Image source={require('./assets/marmita2.png')} style={styles.itemImage} />
+          <View style={styles.itemInfo}>
+            <Text style={styles.itemName}>Marmita Fitness</Text>
+            <Text style={styles.itemPrice}>R$ 10,00</Text>
+          </View>
+          <TouchableOpacity onPress={() => addItemToCart('Marmita Fitness')} style={styles.itemButton}>
+            <Text style={styles.itemButtonText}>Adicionar ao Carrinho</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+          <Image source={require('./assets/marmita3.png')} style={styles.itemImage} />
+          <View style={styles.itemInfo}>
+            <Text style={styles.itemName}>Marmita Vegana</Text>
+            <Text style={styles.itemPrice}>R$ 10,00</Text>
+          </View>
+          <TouchableOpacity onPress={() => addItemToCart('Marmita Vegana')} style={styles.itemButton}>
+            <Text style={styles.itemButtonText}>Adicionar ao Carrinho</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <Modal visible={visible} animationType="slide">
+        <View style={styles.modal}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <AntDesign name="close" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>Carrinho de Compras</Text>
           {cartItems.length > 0 ? (
-            <View style={styles.cart}>
-              <FlatList
-                data={cartItems}
-                renderItem={({ item }) => (
-                  <View style={styles.cartItem}>
-                    <Text style={styles.cartItemName}>{item.name}</Text>
-                    <TouchableOpacity
-                      onPress={() => removeFromCart(item)}
-                    >
-                      <Icon
-                        style={styles.cartItemRemoveIcon}
-                        type="material"
-                        name="remove"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.cartItemPrice}>
-                      R$ {item.price.toFixed(2)}
-                    </Text>
-                  </View>
-                )}
-                keyExtractor={(item) => item.id.toString()}
-              />
-              <View style={styles.checkout}>
-                <Text style={styles.checkoutTotal}>
-                  Total: R${' '}
-                  {cartItems.reduce(
-                    (total, item) => total + item.price,
-                    0
-                  ).toFixed(2)}
-                </Text>
-                <TouchableOpacity style={styles.checkoutButton}>
-                  <Text style={styles.checkoutButtonText}>Checkout</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <ScrollView>
+              {cartItems.map((item, index) => (
+                <View style={styles.cartItem} key={index}>
+                  <Text style={styles.cartItemName}>{item}</Text>
+                  <TouchableOpacity onPress={() => removeItemFromCart(item)}>
+                    <AntDesign name="delete" size={24} color="black" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
           ) : (
-            <View style={styles.emptyCart}>
-              <Text style={styles.emptyCartText}>Carrinho vazio</Text>
-            </View>
+            <Text style={styles.emptyCart}>Seu carrinho está vazio</Text>
           )}
+          <View style={styles.totalPrice}>
+            <Text style={styles.totalPriceText}>Total: R$ {totalPrice.toFixed(2)}</Text>
+            <Button title="Finalizar Compra" onPress={() => alert('Compra finalizada!')} />
+          </View>
         </View>
       </Modal>
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.bottomBarButton} onPress={toggleModal}>
-          <Icon name="shopping-cart" type="material" color="#fff" size={30} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomBarButton}>
-          <Icon name="home" type="material" color="#fff" size={30} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
-}
+};
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator tabBarOptions={{ style: styles.tabBar }}>
+        <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} /> }} />
+        <Tab.Screen  name="Carrinho" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons  name="shopping-cart" size={24} color={color} /> }} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
-  navBar: {
-    height: 70,
-    backgroundColor: '#6e798c',
-    justifyContent: 'center',
+  header: {
+    backgroundColor: '#ffa500',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  navBarText: {
-    color: '#fff',
-    fontSize: 18,
+  headerText: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: 'white',
+  },
+  logo: {
+    width: 50,
+    height: 50,
   },
   content: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#F7F7F7',
   },
-  menuItem: {
+  item: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#6e798c',
-    paddingVertical: 10,
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  menuItemImageContainer: {
+  itemImage: {
     width: 80,
     height: 80,
-    backgroundColor: '#6e798c',
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 10,
   },
-  menuItemInfo: {
+  itemInfo: {
     flex: 1,
-    paddingLeft: 10,
+    marginHorizontal: 10,
   },
-  menuItemName: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  menuItemDescription: {
-    color: '#6e798c',
-    marginBottom: 5,
-  },
-  menuItemPrice: {
-    fontWeight: 'bold',
+  itemName: {
     fontSize: 18,
+    fontWeight: 'bold',
   },
-  bottomBar: {
-    height: 60,
-    backgroundColor: '#6e798c',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+  itemPrice: {
+    fontSize: 16,
+    color: '#666',
   },
-  bottomBarButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  itemButton: {
+    backgroundColor: '#ffa500',
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  cart: {
+  itemButtonText: {
+    color: 'white',
+    fontSize: 14,
+  },
+  modal: {
     flex: 1,
-    paddingTop: 20,
+    backgroundColor: 'white',
+    paddingTop: 40,
     paddingHorizontal: 20,
   },
   closeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   cartItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingVertical: 10,
   },
   cartItemName: {
-    fontSize: 16,
-  },
-  cartItemRemoveIcon: {
-    marginLeft: 10,
-  },
-  cartItemPrice: {
-    fontSize: 16,
-  },
-  checkout: {
-    marginTop: 20,
-  },
-  checkoutTotal: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
-  // checkoutButton:
-  checkoutButtonText: {
-  color: '#fff',
-  fontWeight: 'bold',
-  fontSize: 16,
-},
   emptyCart: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-  emptyCartText: {
-  fontSize: 18,
-  color: '#6e798c',
-},
-  modal: {
-  flex: 1,
-  backgroundColor: '#fff',
-  marginTop: 250,
-  borderTopLeftRadius: 10,
-  borderTopRightRadius: 10,
-  padding: 20,
-},
-  modalHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 20,
-},
-  modalHeaderText: {
-  fontSize: 18,
-  fontWeight: 'bold',
-},
-  modalCloseButton: {
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  backgroundColor: '#6e798c',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-  modalCloseIcon: {
-  color: '#fff',
-},
-  modalMenuItem: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 10,
-  paddingBottom: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: '#ccc',
-},
-  modalMenuItemImageContainer: {
-  width: 80,
-  height: 80,
-  backgroundColor: '#6e798c',
-  borderRadius: 5,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-  modalMenuItemInfo: {
-  flex: 1,
-  paddingLeft: 10,
-},
-  modalMenuItemName: {
-  fontWeight: 'bold',
-  fontSize: 16,
-  marginBottom: 5,
-},
-  modalMenuItemDescription: {
-  color: '#6e798c',
-  marginBottom: 5,
-},
-  modalMenuItemPrice: {
-  fontWeight: 'bold',
-  fontSize: 18,
-},
+    fontSize: 18,
+    alignSelf: 'center',
+    marginVertical: 50,
+  },
+  totalPrice: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    paddingTop: 20,
+  },
+  totalPriceText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  tabBar: {
+    backgroundColor: 'white',
+    borderTopWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
 });
 
 export default App;
